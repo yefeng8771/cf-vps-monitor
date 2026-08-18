@@ -6240,40 +6240,78 @@ html[data-monitor-theme='aurora'] .nav-logo-mark {
 }
 
 /* ===== EasyTier peer list ===== */
-.et-monitor-shell { display: flex; flex-direction: column; gap: 12px; }
+.et-monitor-shell { display: flex; flex-direction: column; gap: 14px; }
 .et-monitor-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .et-monitor-error {
   display: flex; align-items: center; gap: 8px;
-  padding: 8px 12px; border-radius: 8px;
+  padding: 10px 14px; border-radius: 10px;
   background: var(--red-a3); color: var(--red-11);
 }
 .et-table-wrap {
   overflow-x: auto;
-  border: 1px solid var(--gray-a6); border-radius: 10px;
+  border: 1px solid var(--gray-a5); border-radius: 12px;
   background: var(--color-panel-solid);
+  box-shadow: 0 1px 3px var(--black-a1);
 }
 .et-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .et-table th, .et-table td {
-  padding: 8px 10px; text-align: left; white-space: nowrap;
+  padding: 10px 14px; text-align: left; white-space: nowrap;
   border-bottom: 1px solid var(--gray-a4);
 }
+.et-table tbody tr:last-child td { border-bottom: none; }
 .et-table thead th {
   position: sticky; top: 0; z-index: 1;
   background: var(--gray-a2); font-weight: 600;
-  color: var(--gray-12); font-size: 12px;
+  color: var(--gray-11); font-size: 12px;
+  letter-spacing: 0.02em;
 }
 .et-table tbody tr:hover { background: var(--gray-a3); }
 .et-row-local { background: var(--green-a2); }
 .et-cell-num { text-align: right; font-variant-numeric: tabular-nums; }
-.et-cell-muted { color: var(--gray-10); }
-.et-cell-host { font-weight: 500; }
-.et-status {
-  display: inline-block; padding: 2px 8px; border-radius: 999px;
-  font-size: 11px; font-weight: 600;
+.et-cell-host { font-weight: 600; color: var(--gray-12); }
+
+/* 虚拟 IP: primary 色 mono */
+.et-ip {
+  font-family: var(--mono-font-family, ui-monospace, monospace);
+  font-weight: 600; font-size: 12.5px;
+  color: var(--accent-11, var(--violet-11));
+  background: none; padding: 0;
 }
-.et-status-local { background: var(--blue-a4); color: var(--blue-11); }
-.et-status-good { background: var(--green-a4); color: var(--green-11); }
-.et-status-ok { background: var(--green-a3); color: var(--green-11); }
-.et-status-warn { background: var(--amber-a4); color: var(--amber-11); }
-.et-status-loss { background: var(--red-a4); color: var(--red-11); }
-.et-empty { text-align: center; color: var(--gray-10); padding: 24px; }
+
+/* 圆角徽章(状态) */
+.et-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 3px 10px; border-radius: 999px;
+  font-size: 11px; font-weight: 600; line-height: 1;
+}
+.et-badge-primary { background: var(--violet-a4); color: var(--violet-11); }
+.et-badge-good { background: var(--green-a4); color: var(--green-11); }
+.et-badge-warn { background: var(--amber-a4); color: var(--amber-11); }
+.et-badge-loss { background: var(--red-a4); color: var(--red-11); }
+
+/* 延迟颜色 */
+.et-lat { font-family: var(--mono-font-family, ui-monospace, monospace); font-weight: 500; font-size: 13px; }
+.et-lat-good { color: var(--green-11); }
+.et-lat-warn { color: var(--amber-11); }
+.et-lat-bad { color: var(--red-11); }
+.et-lat-muted { color: var(--gray-10); }
+
+/* 流量: 接收/发送 图标 */
+.et-traffic {
+  display: inline-flex; align-items: center; gap: 12px;
+  font-family: var(--mono-font-family, ui-monospace, monospace); font-size: 12.5px;
+}
+.et-traffic-rx, .et-traffic-tx {
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.et-traffic-rx { color: var(--green-11); }
+.et-traffic-tx { color: var(--blue-11); }
+
+/* 隧道协议 徽章 */
+.et-tunnel {
+  display: inline-block; padding: 2px 8px; border-radius: 6px;
+  font-size: 11px; font-weight: 500; color: var(--gray-11);
+  background: var(--gray-a3);
+}
+
+.et-empty { text-align: center; color: var(--gray-10); padding: 32px; }

@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Text } from '@radix-ui/themes';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, ArrowDown, ArrowUp } from 'lucide-react';
 
 // EasyTier peer list (透传 us.bwg 中心节点 et-wrap 服务)
 export type EtPeer = {
@@ -31,14 +31,34 @@ function fmtNum(v?: string): string {
   return v;
 }
 
+// 字节数转 MB(参考站风格: 显示 0.00 MB)
+function fmtBytes(v?: string): string {
+  const raw = fmtNum(v);
+  if (raw === '-') return '0.00';
+  const n = parseFloat(raw);
+  if (Number.isNaN(n)) return raw;
+  if (n >= 1024 * 1024 * 1024) return (n / 1024 / 1024 / 1024).toFixed(2);
+  return (n / 1024 / 1024).toFixed(2);
+}
+
+// 状态: 本机=primary, 直连=success, 高延迟/丢包=warn/loss
 function statusOf(p: EtPeer): { label: string; cls: string } {
-  if (isLocal(p)) return { label: '本机', cls: 'et-status-local' };
+  if (isLocal(p)) return { label: '本机', cls: 'et-badge-primary' };
   const loss = parseFloat(p.loss_rate || '0');
   const lat = parseFloat(p.lat_ms || '0');
-  if (loss > 0) return { label: '丢包', cls: 'et-status-loss' };
-  if (lat > 0 && lat < 200) return { label: '良好', cls: 'et-status-good' };
-  if (lat >= 200) return { label: '高延迟', cls: 'et-status-warn' };
-  return { label: '在线', cls: 'et-status-ok' };
+  if (loss > 0) return { label: '丢包', cls: 'et-badge-loss' };
+  if (lat > 0 && lat < 200) return { label: '直连', cls: 'et-badge-good' };
+  if (lat >= 200) return { label: '高延迟', cls: 'et-badge-warn' };
+  return { label: '在线', cls: 'et-badge-good' };
+}
+
+// 延迟颜色阈值(参考站: >=200 红色)
+function latCls(lat?: string): string {
+  const n = parseFloat(lat || '0');
+  if (!n || n <= 0) return 'et-lat-muted';
+  if (n >= 200) return 'et-lat-bad';
+  if (n >= 100) return 'et-lat-warn';
+  return 'et-lat-good';
 }
 
 export default function EasyTierList() {
@@ -83,11 +103,15 @@ export default function EasyTierList() {
     ? new Date(updatedAt).toLocaleTimeString('zh-CN', { hour12: false })
     : '-';
 
+  const COLS = 6;
+
   return (
-    <section className="website-monitor-shell et-monitor-shell">
+    <section className="et-monitor-shell">
       <header className="et-monitor-head">
         <Text size="4" weight="bold">EasyTier 节点列表</Text>
-        <Text size="1" color="gray">自动刷新 {REFRESH_MS / 1000}s · 更新于 {updatedText} · 共 {peers.length} 个节点</Text>
+        <Text size="1" color="gray">
+          自动刷新 {REFRESH_MS / 1000}s · 更新于 {updatedText} · 在线 {peers.length} 个节点
+        </Text>
       </header>
 
       {error && (
@@ -103,46 +127,40 @@ export default function EasyTierList() {
             <tr>
               <th>状态</th>
               <th>主机名</th>
-              <th>IPv4</th>
-              <th>CIDR</th>
-              <th>成本</th>
-              <th>延迟</th>
-              <th>丢包率</th>
-              <th>下行</th>
-              <th>上行</th>
-              <th>隧道</th>
-              <th>NAT</th>
-              <th>版本</th>
+              <th>虚拟 IP</th>
+              <th className="et-cell-num">延迟 (ms)</th>
+              <th className="et-cell-num">接收 / 发送 (MB)</th>
+              <th>隧道协议</th>
             </tr>
           </thead>
           <tbody>
             {peers.map((p, idx) => {
               const st = statusOf(p);
+              const lat = fmtNum(p.lat_ms);
               return (
                 <tr key={p.id || p.ipv4 || idx} className={isLocal(p) ? 'et-row-local' : ''}>
-                  <td><span className={`et-status ${st.cls}`}>{st.label}</span></td>
+                  <td><span className={`et-badge ${st.cls}`}>{st.label}</span></td>
                   <td className="et-cell-host">{fmtNum(p.hostname)}</td>
-                  <td><code>{fmtNum(p.ipv4)}</code></td>
-                  <td className="et-cell-muted">{fmtNum(p.cidr)}</td>
-                  <td>{fmtNum(p.cost)}</td>
-                  <td className="et-cell-num">{fmtNum(p.lat_ms)}</td>
-                  <td className="et-cell-num">{fmtNum(p.loss_rate)}</td>
-                  <td className="et-cell-num">{fmtNum(p.rx_bytes)}</td>
-                  <td className="et-cell-num">{fmtNum(p.tx_bytes)}</td>
-                  <td className="et-cell-muted">{fmtNum(p.tunnel_proto)}</td>
-                  <td className="et-cell-muted">{fmtNum(p.nat_type)}</td>
-                  <td className="et-cell-muted">{fmtNum(p.version)}</td>
+                  <td><code className="et-ip">{fmtNum(p.ipv4)}</code></td>
+                  <td className="et-cell-num"><span className={`et-lat ${latCls(p.lat_ms)}`}>{lat}</span></td>
+                  <td className="et-cell-num">
+                    <div className="et-traffic">
+                      <span className="et-traffic-rx"><ArrowDown size={12} />{fmtBytes(p.rx_bytes)}</span>
+                      <span className="et-traffic-tx"><ArrowUp size={12} />{fmtBytes(p.tx_bytes)}</span>
+                    </div>
+                  </td>
+                  <td><span className="et-tunnel">{fmtNum(p.tunnel_proto)}</span></td>
                 </tr>
               );
             })}
             {peers.length === 0 && !loading && (
               <tr>
-                <td colSpan={12} className="et-empty">暂无节点数据</td>
+                <td colSpan={COLS} className="et-empty">暂无节点数据</td>
               </tr>
             )}
             {loading && peers.length === 0 && (
               <tr>
-                <td colSpan={12} className="et-empty">加载中…</td>
+                <td colSpan={COLS} className="et-empty">加载中…</td>
               </tr>
             )}
           </tbody>
