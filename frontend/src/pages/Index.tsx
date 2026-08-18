@@ -480,7 +480,7 @@ export default function Index() {
 
       {apiError && <ApiUnavailableNotice error={apiError} />}
 
-      {monitorMode === 'servers' ? (
+      {monitorMode === 'servers' && (
         <React.Suspense fallback={null}>
           <NodeDisplay
             nodes={sortedClients}
@@ -490,7 +490,8 @@ export default function Index() {
             includeHidden={isAuthenticated}
           />
         </React.Suspense>
-      ) : (
+      )}
+      {monitorMode === 'websites' && (
         <section className="website-monitor-shell">
           {websitesError && <ApiUnavailableNotice error={websitesError} />}
           <WebsiteMonitorList monitors={websites} loading={websitesLoading} periodHours={websitePeriodHours} onPeriodChange={handleWebsitePeriodChange} periods={WEBSITE_MONITOR_PERIODS} />
