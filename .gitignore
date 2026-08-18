@@ -53,6 +53,17 @@ Thumbs.db
 *.exe
 agent/cf-monitor-agent.exe
 agent/agent.exe
+agent/agent
+agent/agent-linux-amd64
+
+# Local-only docs/handoff
+HANDOFF.md
+
+# Lockfiles (not tracked in this repo)
+package-lock.json
+frontend/package-lock.json
+worker/package-lock.json
 
 # 文档目录仅本地保留，不提交、不推送
 docs/
+DEPLOY_NOTES.md
