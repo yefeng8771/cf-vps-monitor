@@ -16,6 +16,7 @@ import { mergePublicClientPatch, normalizePublicClients } from '../utils/publicC
 import { fetchWithBootstrapRetry } from '../utils/api';
 import { getLocalStorageItem } from '../utils/browserStorage';
 import WebsiteMonitorList, { WebsiteMonitorSummary } from '../components/WebsiteMonitorList';
+import EasyTierList from '../components/EasyTierList';
 import { subscribeWebsiteMonitorsUpdated, type WebsiteMonitorsUpdateDetail } from '../utils/websiteMonitorEvents';
 import { notifyPublicDataReady, subscribePublicDataUpdated } from '../utils/publicDataEvents';
 import type { PublicDataUpdateDetail } from '../utils/publicDataEvents';
@@ -232,7 +233,9 @@ export default function Index() {
   const location = useLocation();
   const { authLoading, isAuthenticated } = useAuth();
   const { liveData, error } = useLiveData();
-  const monitorMode = new URLSearchParams(location.search).get('view') === 'websites' ? 'websites' : 'servers';
+  const viewParam = new URLSearchParams(location.search).get('view');
+  const monitorMode: 'servers' | 'websites' | 'easytier' =
+    viewParam === 'websites' ? 'websites' : viewParam === 'easytier' ? 'easytier' : 'servers';
   const initialBootstrap = useMemo(() => getCachedPublicBootstrap(), []);
   const [clients, setClients] = useState<ClientInfo[]>(() => initialBootstrap?.clients || []);
   const [clientsLoading, setClientsLoading] = useState(initialBootstrap?.clients === undefined);
@@ -491,6 +494,11 @@ export default function Index() {
         <section className="website-monitor-shell">
           {websitesError && <ApiUnavailableNotice error={websitesError} />}
           <WebsiteMonitorList monitors={websites} loading={websitesLoading} periodHours={websitePeriodHours} onPeriodChange={handleWebsitePeriodChange} periods={WEBSITE_MONITOR_PERIODS} />
+        </section>
+      )}
+      {monitorMode === 'easytier' && (
+        <section className="website-monitor-shell">
+          <EasyTierList />
         </section>
       )}
     </div>

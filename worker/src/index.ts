@@ -58,6 +58,9 @@ type RuntimeBindings = {
   JWT_SECRET?: string;
   SETUP_DIAGNOSTICS_ENABLED?: string;
   CURRENT_GIT_COMMIT?: string;
+  // EasyTier peer-list 上游 (us.bwg 中心节点 et-wrap 服务)
+  ET_API_TOKEN?: string;
+  ET_UPSTREAM_URL?: string;
 };
 
 // Wrangler owns configured bindings; this adds runtime-only optional values.

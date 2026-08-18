@@ -6238,3 +6238,42 @@ html[data-monitor-theme='aurora'] .nav-logo-mark {
   border-radius: 8px;
   background: var(--gray-a2);
 }
+
+/* ===== EasyTier peer list ===== */
+.et-monitor-shell { display: flex; flex-direction: column; gap: 12px; }
+.et-monitor-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.et-monitor-error {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: 8px;
+  background: var(--red-a3); color: var(--red-11);
+}
+.et-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--gray-a6); border-radius: 10px;
+  background: var(--color-panel-solid);
+}
+.et-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.et-table th, .et-table td {
+  padding: 8px 10px; text-align: left; white-space: nowrap;
+  border-bottom: 1px solid var(--gray-a4);
+}
+.et-table thead th {
+  position: sticky; top: 0; z-index: 1;
+  background: var(--gray-a2); font-weight: 600;
+  color: var(--gray-12); font-size: 12px;
+}
+.et-table tbody tr:hover { background: var(--gray-a3); }
+.et-row-local { background: var(--green-a2); }
+.et-cell-num { text-align: right; font-variant-numeric: tabular-nums; }
+.et-cell-muted { color: var(--gray-10); }
+.et-cell-host { font-weight: 500; }
+.et-status {
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  font-size: 11px; font-weight: 600;
+}
+.et-status-local { background: var(--blue-a4); color: var(--blue-11); }
+.et-status-good { background: var(--green-a4); color: var(--green-11); }
+.et-status-ok { background: var(--green-a3); color: var(--green-11); }
+.et-status-warn { background: var(--amber-a4); color: var(--amber-11); }
+.et-status-loss { background: var(--red-a4); color: var(--red-11); }
+.et-empty { text-align: center; color: var(--gray-10); padding: 24px; }

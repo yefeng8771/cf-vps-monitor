@@ -1709,4 +1709,31 @@ publicRoutes.get('/live', async (c) => {
   return response;
 });
 
+// EasyTier peer-list 代理 - 透传 us.bwg 中心节点 et-wrap 服务的 /nodes
+// 上游: ET_UPSTREAM_URL (默认 https://et.198707.xyz/nodes), 鉴权 Bearer ET_API_TOKEN
+const ET_UPSTREAM_DEFAULT = 'https://et.198707.xyz/nodes';
+const ET_PROXY_CACHE_SECONDS = 15;
+
+publicRoutes.get('/et/nodes', async (c: PublicContext) => {
+  const upstream = c.env.ET_UPSTREAM_URL?.trim() || ET_UPSTREAM_DEFAULT;
+  const token = c.env.ET_API_TOKEN?.trim();
+  if (!token) {
+    return c.json({ error: 'EasyTier upstream token not configured' }, 503);
+  }
+  try {
+    const upstreamRes = await fetch(upstream, {
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+      cf: { cacheTtl: ET_PROXY_CACHE_SECONDS, cacheEverything: true },
+    });
+    const body = await upstreamRes.text();
+    if (!upstreamRes.ok) {
+      return c.json({ error: 'EasyTier upstream error', status: upstreamRes.status, detail: body.slice(0, 200) }, 502);
+    }
+    c.header('Cache-Control', `public, max-age=${ET_PROXY_CACHE_SECONDS}`);
+    return c.body(body, 200, { 'Content-Type': 'application/json; charset=utf-8' });
+  } catch (err) {
+    return c.json({ error: 'EasyTier proxy failed', detail: String(err) }, 502);
+  }
+});
+
 export { publicRoutes, generateToken, hashPassword, verifyPassword };
